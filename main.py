@@ -1,15 +1,19 @@
-import os
-from dotenv import load_dotenv
-from langchain_google_genai import ChatGoogleGenerativeAI
+from app.models.gemini_model import model
+from app.prompt.basic_prompt import prompt
+from langchain_core.messages import SystemMessage, HumanMessage
 
-load_dotenv()
-api_key = os.getenv("GEMINI_API_KEY")
-
-model = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
-    google_api_key=api_key
+formatted_prompt = prompt.invoke(
+    {
+        "question": "Give me 5 study tips to be better"
+    }
 )
 
-response = model.invoke("tell me somethingn about cricket .")
+chain = prompt | model
 
-print(response.content) 
+response = chain.invoke(
+    {
+        "question": "Give me 5 study tips to be better"
+    }
+)
+
+print(response.content)
