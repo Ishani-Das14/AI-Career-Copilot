@@ -1,5 +1,6 @@
 from app.models.gemini_model import model
 from app.prompt.basic_prompt import prompt
+from app.parsers.output_parser import parser
 from langchain_core.messages import SystemMessage, HumanMessage
 
 formatted_prompt = prompt.invoke(
@@ -8,7 +9,7 @@ formatted_prompt = prompt.invoke(
     }
 )
 
-chain = prompt | model
+chain = prompt | model | parser
 
 response = chain.invoke(
     {
@@ -16,4 +17,4 @@ response = chain.invoke(
     }
 )
 
-print(response.content)
+print(response)
