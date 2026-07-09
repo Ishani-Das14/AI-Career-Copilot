@@ -1,0 +1,14 @@
+resume = """
+Education:
+B.Tech in Computer Science (AI & ML)
+
+Skills:
+Python
+SQL
+Machine Learning
+TensorFlow
+
+Projects:
+AI Career Copilot
+Diabetes Prediction
+"""

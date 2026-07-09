@@ -1,19 +1,18 @@
 from app.models.gemini_model import model
-from app.prompt.basic_prompt import prompt
+from app.prompt.ats_resume_prompt import ats_resume_prompt
 from app.parsers.output_parser import parser
-from langchain_core.messages import SystemMessage, HumanMessage
+from app.services.file_reader import read_text_file
 
-formatted_prompt = prompt.invoke(
-    {
-        "question": "Give me 5 study tips to be better"
-    }
-)
+chain = ats_resume_prompt | model | parser
 
-chain = prompt | model | parser
+resume = read_text_file("data/resume.txt")
+job_description = read_text_file("data/job_description.txt")
+
 
 response = chain.invoke(
     {
-        "question": "Give me 5 study tips to be better"
+        "resume": resume,
+        "job_description": job_description
     }
 )
 

@@ -1,0 +1,11 @@
+job_description = """
+Machine Learning Engineer
+
+Requirements:
+- Python
+- SQL
+- TensorFlow
+- Docker
+- AWS
+- Git
+"""
