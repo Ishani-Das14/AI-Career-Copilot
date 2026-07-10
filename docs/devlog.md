@@ -1,48 +1,40 @@
-# July 8, 2026
+# Commit 3 - Prompt Templates & LCEL
 
-## Sprint 1 - Prompt Templates & LCEL
+## Learned
+- ChatPromptTemplate
+- LCEL
+- Dynamic placeholders
 
-### What I Learned
+## Implemented
+- Created reusable prompt
+- Built first LCEL chain
 
-- Difference between Chat Models and Prompt Templates.
-- Learned how `ChatPromptTemplate` works.
-- Understood dynamic placeholders using `{question}`.
-- Learned the difference between `prompt.invoke()` and `model.invoke()`.
-- Learned how LCEL connects runnables using the `|` operator.
-- Built my first LangChain chain.
+## Key Takeaway
+Prompt Templates + LCEL make AI pipelines modular.
 
-### What I Implemented
+# Commit 4 - Output Parser
 
-- Created `app/models/gemini_model.py`.
-- Created `app/prompt/basic_prompt.py`.
-- Moved Gemini configuration into a separate module.
-- Created a reusable `ChatPromptTemplate`.
-- Replaced manually created messages with a prompt template.
-- Connected the prompt template to Gemini using LCEL.
+## Learned
+- StrOutputParser
+- AIMessage vs String
 
-### Problems Faced
+## Implemented
+- Added parser to LCEL pipeline
 
-- Python import errors (`ModuleNotFoundError`).
-- Accidentally tried to commit the virtual environment.
-- `.gitignore` was not ignoring `.newenv`.
+## Key Takeaway
+Output Parsers simplify model responses.
 
-### Solutions
+# Commit 5 - ATS Resume Matcher
 
-- Added `.newenv/` to `.gitignore`.
-- Removed the cached virtual environment from Git.
-- Created `__init__.py` files.
-- Fixed the import path.
+## Learned
+- Multiple Prompt Variables
+- Prompt Engineering
+- File Handling
 
-### Git Commit
+## Implemented
+- Built ATS Resume Matcher
+- Added file reader service
+- Moved inputs to external files
 
-Commit 3
-
-Summary:
-Integrate ChatPromptTemplate and LCEL
-
-### Key Takeaways
-
-- Prompt Templates create messages.
-- Chat Models generate responses.
-- LCEL automatically connects multiple runnables.
-- Every component should have a single responsibility.
+## Key Takeaway
+Separated data, business logic, and AI logic.
