@@ -76,3 +76,21 @@ Documents must be split into smaller chunks before creating embeddings for RAG.
 
 ## Key Takeaway
 RAG retrieves relevant document chunks using vector similarity before sending context to the LLM.
+
+
+# Commit 8 - End-to-End RAG Pipeline
+
+## Learned
+- RAG Prompt Engineering
+- Context Injection
+- Retrieval + Generation
+- Document-to-Context Conversion
+
+## Implemented
+- Created RAG prompt template
+- Connected retriever with Gemini
+- Converted retrieved documents into context
+- Generated grounded AI responses
+
+## Key Takeaway
+Combined semantic retrieval with an LLM to generate accurate answers using retrieved document context.

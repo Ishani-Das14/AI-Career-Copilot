@@ -1,19 +1,33 @@
-from app.models.gemini_model import model
-from app.prompt.ats_resume_prompt import ats_resume_prompt
-from app.parsers.output_parser import parser
-from app.services.file_reader import read_text_file
+from app.services.ats_service import analyze_resume
+from app.services.rag_service import ask_question
 
-chain = ats_resume_prompt | model | parser
+print("========== AI Career Copilot ==========")
+print("1. ATS Resume Analysis")
+print("2. Resume Chat")
 
-resume = read_text_file("data/resume.txt")
-job_description = read_text_file("data/job_description.txt")
+choice = input("\nChoose an option: ")
 
+if choice == "1":
 
-response = chain.invoke(
-    {
-        "resume": resume,
-        "job_description": job_description
-    }
-)
+    response = analyze_resume(
+        resume_path="data/resume.txt",
+        job_description_path="data/job_description.txt"
+    )
 
-print(response)
+    print("\nATS Review:\n")
+    print(response)
+
+elif choice == "2":
+
+    question = input("\nAsk a question about your resume: ")
+
+    response = ask_question(
+        pdf_path="data/resume.pdf",
+        question=question
+    )
+
+    print("\nAnswer:\n")
+    print(response)
+
+else:
+    print("Invalid choice.")

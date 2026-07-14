@@ -19,10 +19,5 @@
 - RAG
 
 ## Phase 4
-- Memory
-- Agents
-- LangGraph
-
-## Phase 5
 - Streamlit UI
 - Deployment
