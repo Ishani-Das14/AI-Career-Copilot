@@ -1,33 +1,53 @@
 from app.services.ats_service import analyze_resume
 from app.services.rag_service import ask_question
 
-print("========== AI Career Copilot ==========")
-print("1. ATS Resume Analysis")
-print("2. Resume Chat")
 
-choice = input("\nChoose an option: ")
+def display_menu():
+    print("\n" + "=" * 45)
+    print("         AI Career Copilot")
+    print("=" * 45)
+    print("1. ATS Resume Analysis")
+    print("2. Resume Chat")
+    print("3. Exit")
 
-if choice == "1":
 
-    response = analyze_resume(
-        resume_path="data/resume.txt",
-        job_description_path="data/job_description.txt"
-    )
+while True:
 
-    print("\nATS Review:\n")
-    print(response)
+    display_menu()
 
-elif choice == "2":
+    choice = input("\nChoose an option: ")
 
-    question = input("\nAsk a question about your resume: ")
+    if choice == "1":
 
-    response = ask_question(
-        pdf_path="data/resume.pdf",
-        question=question
-    )
+        response = analyze_resume(
+            resume_path="data/resume.txt",
+            job_description_path="data/job_description.txt"
+        )
 
-    print("\nAnswer:\n")
-    print(response)
+        print("\nATS Review:\n")
+        print(response)
 
-else:
-    print("Invalid choice.")
+        input("\nPress Enter to return to the menu...")
+
+    elif choice == "2":
+
+        question = input("\nAsk a question about your resume: ")
+
+        response = ask_question(
+            pdf_path="data/resume.pdf",
+            question=question
+        )
+
+        print("\nAnswer:\n")
+        print(response)
+
+        input("\nPress Enter to return to the menu...")
+
+    elif choice == "3":
+
+        print("\nThank you for using AI Career Copilot!")
+        break
+
+    else:
+
+        print("\n Invalid choice. Please try again.")
