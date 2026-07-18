@@ -1,4 +1,9 @@
+import os
+import tempfile
+
 import streamlit as st
+
+from app.services.rag_service import create_retriever, ask_question_with_retriever
 
 
 def render_chat_card():
@@ -6,6 +11,10 @@ def render_chat_card():
 
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = []
+
+    # Streamlit auto-populates st.session_state["resume"] because the file_uploader
+    # in ats_card.py uses key="resume". We just read it here — never write to it.
+    resume = st.session_state.get("resume")
 
     with st.container(border=True):
 
@@ -48,7 +57,7 @@ I can help you with:
 - 💼 Job Matching
 - 🚀 Project Suggestions
 
-Ask me anything to get started.
+Upload your resume and ask me anything to get started.
 """
                     )
 
@@ -83,32 +92,53 @@ Ask me anything to get started.
             if question.strip() == "":
                 st.warning("Please enter a question.")
 
+            elif not resume:
+                st.error("📂 Please upload your resume in the **ATS Resume Analyzer** panel first.")
+
             else:
 
-                st.session_state.chat_history.append(
-                    ("user", question)
-                )
-
                 # -----------------------------------
-                # Temporary AI Response
+                # Build retriever once, cache it in session state
                 # -----------------------------------
 
-                response = """
-Your resume demonstrates a strong AI/ML foundation.
+                if "retriever" not in st.session_state:
 
-### Suggestions
+                    with st.spinner("🧠 Indexing your resume for the first time..."):
 
-✅ Add measurable achievements.
+                        with tempfile.NamedTemporaryFile(
+                            delete=False,
+                            suffix=".pdf",
+                        ) as temp_pdf:
+                            temp_pdf.write(resume.getbuffer())
+                            temp_path = temp_pdf.name
 
-✅ Mention Docker and Cloud technologies.
+                        try:
+                            st.session_state["retriever"] = create_retriever(temp_path)
+                        finally:
+                            if os.path.exists(temp_path):
+                                os.remove(temp_path)
 
-✅ Improve ATS keyword matching.
+                # -----------------------------------
+                # Ask the Real Backend
+                # -----------------------------------
 
-✅ Expand project descriptions with measurable impact.
-"""
+                st.session_state.chat_history.append(("user", question))
 
-                st.session_state.chat_history.append(
-                    ("assistant", response)
-                )
+                try:
+
+                    with st.spinner("🤖 AI is thinking..."):
+
+                        response = ask_question_with_retriever(
+                            st.session_state["retriever"],
+                            question,
+                        )
+
+                    st.session_state.chat_history.append(("assistant", response))
+
+                except Exception as e:
+
+                    st.session_state.chat_history.append(
+                        ("assistant", f"⚠️ Sorry, an error occurred: {e}")
+                    )
 
                 st.rerun()

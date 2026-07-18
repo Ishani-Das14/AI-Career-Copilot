@@ -19,7 +19,7 @@ def load_css():
 
 html,
 body,
-[class*="css"]{
+.stApp {
     font-family: "Inter", sans-serif;
 }
 
@@ -76,6 +76,8 @@ h2,h3{
 [data-testid="stVerticalBlockBorderWrapper"]{
 
     background:#171B22;
+
+    color:#C9D1D9;
 
     border:1px solid #2D3748;
 

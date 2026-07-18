@@ -42,6 +42,7 @@ def retrieve_context(retriever, question):
 
 
 def ask_question(pdf_path, question):
+    """Ask a question by building the retriever from scratch (used in main.py / CLI)."""
 
     retriever = create_retriever(pdf_path)
 
@@ -59,3 +60,20 @@ def ask_question(pdf_path, question):
 
     return response
 
+
+def ask_question_with_retriever(retriever, question):
+    """Ask a question using a pre-built cached retriever (used in Streamlit UI to avoid expensive re-creation)."""
+
+    context = retrieve_context(
+        retriever,
+        question
+    )
+
+    response = chain.invoke(
+        {
+            "context": context,
+            "question": question
+        }
+    )
+
+    return response

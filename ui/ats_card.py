@@ -1,14 +1,25 @@
+import os
+import tempfile
+
 import streamlit as st
+
+from app.services.ats_service import analyze_resume
+
+
+def _on_resume_change():
+    """
+    Callback fired by Streamlit when the resume file_uploader changes.
+    Callbacks are the ONLY safe place to write to session_state after a widget
+    has been instantiated. We use this to invalidate the cached FAISS retriever
+    whenever a new resume is uploaded.
+    """
+    st.session_state.pop("retriever", None)
 
 
 def render_ats_card():
     """Render the ATS Resume Analyzer."""
 
     with st.container(border=True):
-
-        # -----------------------------------
-        # Header
-        # -----------------------------------
 
         st.subheader("📄 ATS Resume Analyzer")
 
@@ -26,33 +37,24 @@ Upload both files below and receive:
 
         st.divider()
 
-        # -----------------------------------
         # Resume Upload
-        # -----------------------------------
-
         st.markdown("### 📄 Resume")
-
-        st.caption("Upload your latest resume (PDF only)")
 
         resume = st.file_uploader(
             "Choose Resume",
             type=["pdf"],
             key="resume",
             label_visibility="collapsed",
+            on_change=_on_resume_change,   # ← clears retriever cache safely
         )
 
-        if resume is not None:
+        if resume:
             st.success(f"✅ {resume.name}")
 
         st.write("")
 
-        # -----------------------------------
         # Job Description Upload
-        # -----------------------------------
-
         st.markdown("### 📋 Job Description")
-
-        st.caption("Upload the target job description (PDF or TXT)")
 
         jd = st.file_uploader(
             "Choose Job Description",
@@ -61,70 +63,62 @@ Upload both files below and receive:
             label_visibility="collapsed",
         )
 
-        if jd is not None:
+        if jd:
             st.success(f"✅ {jd.name}")
 
         st.write("")
-
         st.divider()
 
-        # -----------------------------------
-        # Analyze Button
-        # -----------------------------------
-
-        analyze = st.button(
-            "🚀 Analyze Resume",
-            use_container_width=True,
-        )
-
-        if analyze:
+        if st.button("🚀 Analyze Resume", use_container_width=True):
 
             if resume is None:
-                st.error("Please upload your resume.")
+                st.error("Please upload a resume.")
                 return
 
             if jd is None:
-                st.error("Please upload the job description.")
+                st.error("Please upload a job description.")
                 return
 
-            with st.spinner("🤖 AI is analyzing your resume..."):
+            try:
 
-                # Temporary Data
-                st.session_state["ats_results"] = {
-                    "score": 87,
-                    "summary": "Excellent match for the selected role.",
+                with st.spinner("🤖 AI is analyzing your resume..."):
 
-                    "matching_skills": [
-                        "Python",
-                        "Machine Learning",
-                        "SQL",
-                        "TensorFlow",
-                        "Scikit-Learn",
-                    ],
+                    # Save Resume
+                    with tempfile.NamedTemporaryFile(
+                        delete=False,
+                        suffix=os.path.splitext(resume.name)[1],
+                    ) as temp_resume:
 
-                    "missing_skills": [
-                        "Docker",
-                        "AWS",
-                        "Kubernetes",
-                    ],
+                        temp_resume.write(resume.getbuffer())
+                        resume_path = temp_resume.name
 
-                    "strengths": [
-                        "Strong AI Projects",
-                        "Relevant Internship Experience",
-                        "Good Technical Skills",
-                    ],
+                    # Save Job Description
+                    with tempfile.NamedTemporaryFile(
+                        delete=False,
+                        suffix=os.path.splitext(jd.name)[1],
+                    ) as temp_jd:
 
-                    "improvements": [
-                        "Add measurable achievements",
-                        "Mention Cloud technologies",
-                        "Improve ATS keywords",
-                    ],
+                        temp_jd.write(jd.getbuffer())
+                        jd_path = temp_jd.name
 
-                    "suggestions": [
-                        "Customize resume for every job.",
-                        "Add Docker experience.",
-                        "Use more action verbs.",
-                    ],
-                }
+                    # REAL BACKEND CALL
+                    results = analyze_resume(
+                        resume_path,
+                        jd_path,
+                    )
 
-            st.success("✨ Analysis Complete!")
+                    st.session_state["ats_results"] = results
+
+                st.success("✅ Analysis Complete!")
+
+            except Exception as e:
+
+                st.exception(e)
+
+            finally:
+
+                if "resume_path" in locals() and os.path.exists(resume_path):
+                    os.remove(resume_path)
+
+                if "jd_path" in locals() and os.path.exists(jd_path):
+                    os.remove(jd_path)
